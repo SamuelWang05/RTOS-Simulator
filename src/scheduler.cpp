@@ -1,16 +1,14 @@
 #include "scheduler.h"
 
-Scheduler::Scheduler(std::vector<Task> taskList) : taskList(std::move(taskList)) {
-}
-
 void Scheduler::addTask(Task& task) {
-    taskList.push_back(task);
+    taskSchedule.insert({task.getPriority(), task});
 }
 
+// Runs the highest priority task
 void Scheduler::run() {
-    for (Task& currTask : taskList) {
-        if (!currTask.getFinished()) {
-            currTask.run();
-        }
+    if (taskSchedule.empty()) {
+        return;
     }
+    (--taskSchedule.end())->second.run(); // Keys sorted in ascending order
+    taskSchedule.erase((--taskSchedule.end())->first); // Remove task after it is done
 }

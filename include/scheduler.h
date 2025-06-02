@@ -1,8 +1,8 @@
 #pragma once
 
-// Cooperative scheduler
+// Non-preemptive priority scheduler
 
-#include "vector"
+#include "map"
 #include "task.h"
 
 #ifndef SCHEDULER_H
@@ -10,9 +10,7 @@
 
 class Scheduler {
 public:
-    Scheduler() : taskList(std::vector<Task>()) {};
-    explicit Scheduler(std::vector<Task> taskList);
-
+    Scheduler() : taskSchedule(std::map<int, Task>()) {}; explicit Scheduler(std::vector<Task> taskList);
     Scheduler(const Scheduler& rhs) = default;
     Scheduler& operator=(const Scheduler& rhs) = default;
     ~Scheduler() = default;
@@ -22,7 +20,7 @@ public:
     void run(); // Runs active tasks in order
 
 private:
-    std::vector<Task> taskList;
+    std::map<int, Task> taskSchedule;
 };
 
 #endif //SCHEDULER_H

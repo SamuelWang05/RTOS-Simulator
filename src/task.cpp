@@ -1,24 +1,26 @@
 #include "task.h"
-
 #include <utility>
 
-Task::Task(const int id, const int priority, std::string  name, bool finished, std::function<void()> func) : id(id), priority(priority), name(std::move(name)), finished(finished), func(std::move(func)) {
+Task::Task(const int id, const int priority, std::string name, State state)
+    : id(id), priority(priority), name(std::move(name)), state(state) {
 }
 
 void Task::run() {
-    func();
-    this->finished = true;
+    switch (state) {
+        case running:
+            doRunning();
+            break;
+        case wait:
+            doWait();
+            break;
+        case done:
+            doDone();
+            break;
+    }
 }
 
-void Task::yield() {
-}
-
-void Task::sleep(int time) {
-}
-
-
-bool Task::getFinished() const {
-    return finished;
+State Task::getState() const {
+    return state;
 }
 
 int Task::getPriority() const {
@@ -26,5 +28,5 @@ int Task::getPriority() const {
 }
 
 void Task::setActive() {
-    finished = false;
+    state = running;
 }

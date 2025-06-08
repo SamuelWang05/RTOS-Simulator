@@ -6,9 +6,12 @@ void Scheduler::addTask(Task& task) {
 
 // Runs the highest priority task
 void Scheduler::run() {
-    if (taskSchedule.empty()) {
+    if (taskSchedule.empty())
         return;
-    }
+
     (--taskSchedule.end())->second.run(); // Keys sorted in ascending order
-    taskSchedule.erase((--taskSchedule.end())->first); // Remove task after it is done
+
+    if ((--taskSchedule.end())->second.getState() == done) {
+        taskSchedule.erase((--taskSchedule.end())->first); // Remove task after it is done
+    }
 }

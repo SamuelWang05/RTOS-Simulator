@@ -17,7 +17,7 @@ void print3() {
 
 /**
  * TODO: [x] implement FSM for tasks
- * TODO: [ ] change scheduler class to handle polymorphism (need to add unique_ptr for task)
+ * TODO: [x] change scheduler class to handle polymorphism (need to add unique_ptr for task)
  * TODO: [ ] use std::chrono library to simulate time (for delays, etc.)
  * TODO: [ ] add different derived tasks (UART, etc.)
  */

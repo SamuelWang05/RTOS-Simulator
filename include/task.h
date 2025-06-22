@@ -1,42 +1,35 @@
 /**
- * A base class for any tasks that can be added to the scheduler
+ * Using concurrent threads to simulate tasks in RTOS on real hardware
  */
 
 #pragma once
 #include <string>
-
-/**
-* In order to simulate RTOS systems, FSM will be used
-*/
-enum State {
-    running,
-    wait,
-    done
-};
+#include <functional>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 
 class Task {
 public:
-    Task() : id(0), priority(0), name(""), state(wait) {};
-    explicit Task(int id, int priority, std::string name, State state);
+    explicit Task(int id, int priority, std::string name, std::function<void(Task&)> func);
 
-    Task(const Task& rhs) = default;
-    Task& operator=(const Task& rhs) = default;
-    virtual ~Task() = default;
+    void taskRun();
+    void taskYield();
+    void taskComplete();
 
-    void run();
-
-    // Methods to be run depending on the state
-    virtual void doRunning() = 0;
-    virtual void doWait() = 0;
-    virtual void doDone() = 0;
-
-    [[nodiscard]] State getState() const;
     [[nodiscard]] int getPriority() const;
-    void setActive();
-
+    [[nodiscard]] bool getRunStatus() const;
+    [[nodiscard]] bool getComplete() const;
 private:
     int id;
     int priority; // 0 (lowest) -> inf. (highest)
     std::string name;
-    State state;
+    std::function<void(Task&)> func;
+
+    std::mutex taskLock;
+    std::condition_variable conditionVar;
+    std::jthread taskThread;
+
+    bool shouldRun = false;
+    bool complete = false;
 };

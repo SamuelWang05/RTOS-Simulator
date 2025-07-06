@@ -1,17 +1,47 @@
 #include "scheduler.h"
+#include <chrono>
+
+Scheduler::Scheduler() : taskSchedule(std::multimap<int, std::unique_ptr<Task>>()) {};
 
 void Scheduler::addTask(std::unique_ptr<Task> task) {
-    taskSchedule.insert({task->getPriority(), std::move(task)});
+    taskSchedule.insert({task->getPriority(),std::move(task)});
 }
 
-// Runs the highest priority task
+void Scheduler::start() {
+    running = true;
+    runLoop();
+}
+
+void Scheduler::stop() {
+    std::unique_lock<std::mutex> lock(schedulerLock);
+    currTask->taskYield();
+    running = false;
+}
+
+void Scheduler::runLoop() {
+    while (running) {
+        std::lock_guard<std::mutex> lock(schedulerLock);
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+}
+
+/**
 void Scheduler::run() {
-    if (taskSchedule.empty())
+
+
+    // TODO -- add simulated tick to do non-preemptive scheduling
+
+    if (taskSchedule.empty()) {
         return;
+    }
 
-    (--taskSchedule.end())->second->run(); // Keys sorted in ascending order
+    auto currTask = --taskSchedule.end();
 
-    if ((--taskSchedule.end())->second->getState() == done) {
-        taskSchedule.erase((--taskSchedule.end())->first); // Remove task after it is done
+    currTask->second->taskRun();
+
+    if (currTask->second->getComplete()) {
+       taskSchedule.erase(currTask);
     }
 }
+*/

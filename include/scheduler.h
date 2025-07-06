@@ -1,5 +1,5 @@
 /**
-* Non-preemptive priority scheduler
+* Preemptive priority scheduler - manages all task threads, tick control, and task switching
 */
 
 #pragma once
@@ -8,22 +8,23 @@
 #include "task.h"
 #include <chrono>
 
-#ifndef SCHEDULER_H
-#define SCHEDULER_H
-
 class Scheduler {
 public:
-    Scheduler() : taskSchedule(std::map<int, std::unique_ptr<Task>>()) {}; explicit Scheduler(std::vector<Task> taskList);
-    Scheduler(const Scheduler& rhs) = default;
-    Scheduler& operator=(const Scheduler& rhs) = default;
-    ~Scheduler() = default;
+    Scheduler();
 
     void addTask(std::unique_ptr<Task> task);
-
-    void run(); // Runs only the first task in the schedule
+    void start();
+    void stop();
 
 private:
-    std::map<int, std::unique_ptr<Task>> taskSchedule;
-};
+    void runLoop();
+    std::atomic<bool> running = true;
+    std::jthread schedulerThread;
 
-#endif //SCHEDULER_H
+    std::multimap<int, std::unique_ptr<Task>> taskSchedule;
+    std::mutex schedulerLock;
+
+    Task* currTask;
+    bool taskShouldRun = false;
+    bool taskComplete = false;
+};

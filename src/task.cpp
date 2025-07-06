@@ -14,6 +14,7 @@ Task::Task(int id, int priority, std::string name, std::function<void(Task&)> fu
             if (complete) break;
 
             shouldRun = false;
+            lock.unlock();
             func(*this);
         }
     });
